@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -15,6 +16,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -130,6 +132,20 @@ object Extensions {
     fun Context.showBottomSheet(bottomSheet: BottomSheetDialog) {
         bottomSheet.create()
         bottomSheet.show()
+    }
+
+    @JvmStatic
+    fun View.loadLocalImage(resource: Int) {
+        Glide.with(this)
+            .load(resource)
+            .into(this as ImageView)
+    }
+
+    @JvmStatic
+    fun View.loadImage(resource: String) {
+        Glide.with(this)
+            .load(resource)
+            .into(this as ImageView)
     }
 
 }

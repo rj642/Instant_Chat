@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import android.view.*
+import com.softocorp.instantchat.R
 import com.softocorp.instantchat.chat.model.ChatModel
 import com.softocorp.instantchat.chat.model.MessageData
 import com.softocorp.instantchat.chat.model.ProfileData
@@ -13,6 +14,7 @@ import com.softocorp.instantchat.databinding.ActivityMessageBinding
 import com.softocorp.instantchat.messages.adapter.MessageAdapter
 import com.softocorp.instantchat.messages.interfaces.MessageListener
 import com.softocorp.instantchat.utils.Extensions.hideSoftKeyboard
+import com.softocorp.instantchat.utils.Extensions.loadLocalImage
 import com.softocorp.instantchat.utils.Extensions.scrollRecycler
 import com.softocorp.instantchat.utils.Extensions.setUpToolbar
 import com.softocorp.instantchat.utils.Extensions.setSnackBar
@@ -35,7 +37,7 @@ class MessageActivity : AppCompatActivity() {
             messageData.add(MessageData())
         }
         for (i in 0..100) {
-            chatData.add(ChatModel(if (i % 3 == 0) pd1 else pd2, if (i % 4 != 0) pd2 else pd1, messageData, ))
+            chatData.add(ChatModel(senderData = if (i % 3 == 0) pd1 else pd2, receiverData = if (i % 4 != 0) pd2 else pd1, message = messageData ))
         }
     }
 
@@ -45,7 +47,7 @@ class MessageActivity : AppCompatActivity() {
         var orgPosition: Int = 0
 
         override fun addMessage() {
-            chatData.add(ChatModel(pd1, receiverData = pd2, lastSentMessage = if (!TextUtils.isEmpty(binding.messageContent.text.toString().trim())) binding.messageContent.text.toString().trim() else "This is another message :)"))
+            chatData.add(ChatModel(senderData = pd1, receiverData = pd2, lastSentMessage = if (!TextUtils.isEmpty(binding.messageContent.text.toString().trim())) binding.messageContent.text.toString().trim() else "This is another message :)"))
             if (this@MessageActivity::binding.isInitialized) {
                 adapter.notifyItemInserted(chatData.size)
                 Handler(Looper.getMainLooper()).postDelayed({
@@ -96,6 +98,8 @@ class MessageActivity : AppCompatActivity() {
         )
 
         binding.apply {
+            senderImage.loadLocalImage(R.drawable.cat_two)
+            senderName.text = "Cool Cat"
             messageRecyclerView.adapter = adapter
             messageRecyclerView.scrollRecycler(chatData.size - 1)
             val toolbarContent = setUpToolbar(toolbar, showBackButton = true)

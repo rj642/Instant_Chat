@@ -60,8 +60,8 @@ class ChatFragment : Fragment() {
             MessageActivity.messageData.add(MessageData())
         }
         for (i in 0..100) {
-            MessageActivity.chatData.add(ChatModel(if (i % 3 == 0) MessageActivity.pd1 else MessageActivity.pd2, if (i % 4 != 0) MessageActivity.pd2 else MessageActivity.pd1,
-                MessageActivity.messageData, ))
+            MessageActivity.chatData.add(ChatModel(senderData = if (i % 3 == 0) MessageActivity.pd1 else MessageActivity.pd2, receiverData = if (i % 4 != 0) MessageActivity.pd2 else MessageActivity.pd1,
+                message = MessageActivity.messageData))
         }
 
         binding.apply {

@@ -3,10 +3,11 @@ package com.softocorp.instantchat.chat.model
 import android.os.Parcelable
 import com.softocorp.instantchat.R
 import kotlinx.parcelize.Parcelize
+import java.util.UUID
 
 @Parcelize
 data class ChatModel @JvmOverloads constructor(
-    var id: String,
+    var id: String = UUID.randomUUID().toString(),
     var senderData: ProfileData,
     var receiverData: ProfileData,
     var message: List<MessageData> = emptyList(),
