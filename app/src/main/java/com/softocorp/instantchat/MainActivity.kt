@@ -56,9 +56,9 @@ class MainActivity : AppCompatActivity() {
 
             floatingActionBtn.setImageResource(R.drawable.ic_chat)
 
-            Handler(Looper.getMainLooper()).postDelayed({
+            floatingActionBtn.setOnClickListener {
                 startActivity(Intent(this@MainActivity, MessageActivity::class.java))
-            }, 2000L)
+            }
 
         }
 

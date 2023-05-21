@@ -12,7 +12,10 @@
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         android:background="#50C148"
+        app:layout_collapseMode="pin"
         app:layout_constraintEnd_toEndOf="parent"
+        app:contentInsetStartWithNavigation="0dp"
+        app:contentInsetStart="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -90,7 +93,7 @@
 
         <androidx.cardview.widget.CardView
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             app:layout_constraintStart_toEndOf="@id/btn_emoji"
             app:layout_constraintEnd_toStartOf="@id/btn_send"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -106,6 +109,10 @@
                 android:layout_height="match_parent"
                 android:hint="Enter a message"
                 android:textSize="14sp"
+                android:padding="15dp"
+                android:maxLines="5"
+                android:scrollbars="vertical"
+                android:background="@android:color/transparent"
                 android:textColor="@color/black"
                 android:fontFamily="sans-serif"
                 android:paddingHorizontal="20dp" />

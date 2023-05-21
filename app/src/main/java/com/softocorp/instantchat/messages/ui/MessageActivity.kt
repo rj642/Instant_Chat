@@ -5,15 +5,17 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import com.softocorp.instantchat.R
+import android.view.*
 import com.softocorp.instantchat.chat.model.ChatModel
 import com.softocorp.instantchat.chat.model.MessageData
 import com.softocorp.instantchat.chat.model.ProfileData
 import com.softocorp.instantchat.databinding.ActivityMessageBinding
 import com.softocorp.instantchat.messages.adapter.MessageAdapter
 import com.softocorp.instantchat.messages.interfaces.MessageListener
+import com.softocorp.instantchat.utils.Extensions.hideSoftKeyboard
 import com.softocorp.instantchat.utils.Extensions.scrollRecycler
 import com.softocorp.instantchat.utils.Extensions.setUpToolbar
+import com.softocorp.instantchat.utils.Extensions.setSnackBar
 
 class MessageActivity : AppCompatActivity() {
 
@@ -38,13 +40,46 @@ class MessageActivity : AppCompatActivity() {
     }
 
     private var listener = object: MessageListener {
+
+        var orgItem: ChatModel? = null
+        var orgPosition: Int = 0
+
         override fun addMessage() {
             chatData.add(ChatModel(pd1, receiverData = pd2, lastSentMessage = if (!TextUtils.isEmpty(binding.messageContent.text.toString().trim())) binding.messageContent.text.toString().trim() else "This is another message :)"))
             if (this@MessageActivity::binding.isInitialized) {
-                binding.messageRecyclerView.adapter?.notifyItemInserted(chatData.size)
+                adapter.notifyItemInserted(chatData.size)
                 Handler(Looper.getMainLooper()).postDelayed({
-                    binding.messageRecyclerView.scrollToPosition(chatData.size - 1)
+                    binding.messageRecyclerView.smoothScrollToPosition(chatData.size - 1)
                 }, 400L)
+            }
+        }
+
+        override fun deleteMessage(item: ChatModel, position: Int) {
+            // Extra check to perform exact removal of the selected entry
+            val found: Boolean = chatData.contains(item)
+            orgItem = item
+            orgPosition = position
+            if (found && (chatData.indexOf(item) == position)) {
+                chatData.remove(item)
+                if (this@MessageActivity::binding.isInitialized) {
+                    adapter.notifyItemRemoved(position)
+                    binding.root.setSnackBar("Message deleted successfully", true, "Undo") {
+                        restoreMessage()
+                        adapter.notifyItemInserted(position)
+                        binding.messageRecyclerView.smoothScrollToPosition(position)
+                        binding.root.setSnackBar("Message restored successfully")
+                    }
+                }
+            } else {
+                if (this@MessageActivity::binding.isInitialized) {
+                    binding.root.setSnackBar("Message can't be deleted")
+                }
+            }
+        }
+
+        override fun restoreMessage() {
+            orgItem?.let { item ->
+                chatData.add(orgPosition, item)
             }
         }
     }
@@ -56,19 +91,43 @@ class MessageActivity : AppCompatActivity() {
 
         adapter = MessageAdapter(
             chatData,
-            "abc1234",
+            currentUid = "abc1234",
             listener
         )
 
         binding.apply {
             messageRecyclerView.adapter = adapter
             messageRecyclerView.scrollRecycler(chatData.size - 1)
-            val toolbarContent = setUpToolbar(toolbar)
+            val toolbarContent = setUpToolbar(toolbar, showBackButton = true)
+            toolbarContent.setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+
             btnSend.setOnClickListener {
                 listener.addMessage()
-                messageContent.setText("")
+                messageContent.setText("".trim())
+                this@MessageActivity.hideSoftKeyboard()
             }
+
+            messageContent.setOnEditorActionListener { _, _, event ->
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    listener.addMessage()
+                    binding.messageContent.setText("".trim())
+                    this@MessageActivity.hideSoftKeyboard()
+                    return@setOnEditorActionListener true
+                }
+                return@setOnEditorActionListener false
+            }
+
         }
 
     }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            this@MessageActivity.hideSoftKeyboard()
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
 }
